@@ -1,0 +1,55 @@
+# Introduction
+
+These release notes include recommendations, known issues, and software limitations for VMware NSX® Migration for VMware Cloud Director™ tool. It also addresses issues filed during the validation of the VMware NSX Migration for the VMware Cloud Director tool.
+For additional information, see the VMware NSX Migration for VMware Cloud Director User Guide.
+
+## Known Issues
+The known issues are grouped as follows.
+
+### Rollback Fails at ‘Reset the target external network’
+```
+Step:[vcdOperations]:[resetTargetExternalNetwork]:3911 [INFO] [VDC-demo]| Rollback:Reset the target external network
+Exception: Failed to reset the target external network 'external-network-name' to its initial state: [ xx-xx-xx-xx-xx]
+The provided list 'ipRanges.values' should have at least one item in it.
+```
+*Reason*: During rollback the migration tool removes the IP address/s used by the target edge gateway from the target external network. If the target external network has no spare IP in its static IP Pool apart from the ones used by target edge gateway/s, then the migration tool won’t be able to remove the IPs as a minimum of one IP should be present in every subnet of an external network.
+Workaround: Add additional IP(s) to the static IP pool of the target external network and run the rollback
+
+### Cleanup Fails at ‘Updating the source External network’
+```
+Step:[vcdNSXMigratorCleanup]:[run]:3542 [INFO] [VDC-demo]| Updating the source External network.
+Exception: Failed to update source external network ‘external-network-name' : [ xx-xx-xx-xx-xx] The provided list 'ipRanges.values' should have at least one item in it.
+```
+*Reason*: During cleanup, the migration tool removes the IP address/s used by the source edge gateway from the source external network. If the source external network has no spare IP in its static IP Pool apart from the ones used by source edge gateway/s, then the migration tool
+won’t be able to remove the IPs as a minimum of one IP should be present in every subnet of an external network.
+Workaround: Will need to clean IP/s manually from static IP Pool of source external network in case of failure.
+
+### vApp network directly connected to Org VDC network scoped to DC group renaming failure
+vApp network directly connected to Org VDC network scoped to DC group is not renamed when the parent network is renamed during cleanup.
+Affected VCD version: 10.3.0 Fixed on: VCD 10.3.1.
+
+### VM loses N-S traffic after rollback
+Description: After rollback is completed, VMs may lose N-S connectivity ().
+
+VM loses N-S traffic following vMotion to an NSX for vSphere host after NSX-v to NSX-T Edge migration cutover was done.
+Fixed on NSX-T 3.1.3.3. For more details, see [Release Notes](https://docs.vmware.com/en/VMware-NSX-T-Data-Center/3.1/rn/VMware-NSX-T-Data-Center-3133-Release-Notes.html)
+
+### Migration of VM having multiple disks with different storage policies fails
+```
+Step: [vcdOperations]:[moveVappApiCall]:3714 [INFO] [Disk-Test]| Moving vApp – vApp-test to target Org VDC - Disk-Test-v2t
+```
+```
+Exception: Failed to move vApp – vApp-test with errors [ 5d7588d9-a62c-4308-9c86-8dbbf5f35564 ] Cannot find VDC storage policy "ef057b95-8e06-4320-a9a2-409fc86d2a7d" in VDC "88594b4a-ca19-478c- af88-9734b485458d"
+```
+Workaround: None
+
+### After migration to NSX-T, NAT rules are not editable through VCD UI
+
+Description: After the migration is completed, the NAT rules created at target are not editable using VCD UI. A lock symbol can be seen while selecting NAT rules.
+
+### VMs connected to distributed Org VDC networks lose network connectivity after N-S network switchover
+
+VMs connected to distributed Org VDC networks lose network connectivity after N-S network switchover and bridging does not work.
+Workaround: Ensure that the MAC Address of the NSX-T Virtual Distributed Router is using a different MAC address than the NSX-V distributed logical router. For more details, see [VMware documents](https://docs.vmware.com/en/VMware-NSX-T-Data-Center/3.1/migration/GUID-538774C2-DE66-4F24-B9B7-537CA2FA87E9.html)
+
+<a href="https://ibb.co/SfJfWJC"><img src="https://i.ibb.co/7kbk8bm/NAT.jpg" alt="NAT" border="0"></a>
