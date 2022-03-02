@@ -6,7 +6,7 @@ For additional information, see the VMware NSX Migration for VMware Cloud Direct
 ## Known Issues
 The known issues are grouped as follows.
 
-### Rollback Fails at ‘Reset the target external network’
+
 ```
 Step:[vcdOperations]:[resetTargetExternalNetwork]:3911 [INFO] [VDC-demo]| Rollback:Reset the target external network
 Exception: Failed to reset the target external network 'external-network-name' to its initial state: [ xx-xx-xx-xx-xx]
